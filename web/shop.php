@@ -63,40 +63,91 @@
         <!-- /.container -->
     </nav>
     <div>
+        <div>
+            <br>
+            Insert User<br>
+            <form action="shop.php" method="GET">
+                <input type="text" placeholder="idUser" name="idUser"></input> <br>
+                <input type="text" placeholder="VornameUser" name="vornameUser"></input> <br>
+                <input type="text" placeholder="NachnameUser" name="nachnameUser"></input> <br>
+
+                <input type="submit" name="submit" value="click"></input>
+                <br>
+                <br>
+            </form>
+        </div>
+
+        <div>
+            Insert Item<br>
+            <form action="shop.php" method="GET">
+            <input type="text" placeholder="idItem" name="idItem"></input>
+            <input type="text" placeholder="nameItem" name="nameItem"></input>
+            <input type="text" placeholder="preisItem" name="preisItem"></input>
+
+            <input type="submit" name="submitinsertUser" value="insertItem">
+            </form>
+            <br>
+            <br>
+        </div>
+
         <?php
-            $json_url = "data.json";
-            $json = file_get_contents($json_url);
-            $data = json_decode($json, TRUE);
-            echo "<pre>";
-            print_r($data);
-            echo "</pre>";
+        // Database Connect
+        $verbindung = mysql_connect("localhost", "root" , "")
+        or die("Verbindung zur Datenbank konnte nicht hergestellt werden");
 
-            //Cread Produkt Class
-            class produkt 
+        mysql_select_db("offshop") or die ("Datenbank konnte nicht ausgewählt werden");
+
+        if(isset($_GET['idUser']))
+        {
+            $id = $_GET["idUser"];
+            $vorname = $_GET["vornameUser"];
+            $nachname = $_GET["nachnameUser"]; 
+           insertUser($id, $vorname, $nachname);
+        }
+        else if(isset($_GET["idItem"]))
+        {
+            $id = $_GET["idItem"];
+            $name = $_GET["nameItem"];
+            $preis = $_GET["preisItem"];
+
+            insertItem($id,$name,$preis);
+
+        }
+
+        function getData ()
+        {
+            $getItems = "SELECT *  FROM items";
+            $getItemsResult = mysql_query($getItems);
+
+            while ($row = mysql_fetch_array($getItemsResult, MYSQL_ASSOC)) 
             {
-                public $kategorie = "";
-                public $name  = "";
-                public $bestand = "";
+                printf("<b>ID: %s </b> <br>  Name: %s <br> Preis: %s <br>", $row["id"], $row["Name"], $row["Preis"]);
+                echo "<br>";
             }
+            echo "<br>";
 
-            //Write Data
-            $e = new produkt();
-            $e->kategorie = "Getraenk";
-            $e->name  = "Cola";
-            $e->bestand = 5;
+           $getUser = "SELECT *  FROM user";
+           $getUserResult = mysql_query($getUser);
 
+           while ($row = mysql_fetch_array($getUserResult, MYSQL_ASSOC)) 
+            {
+                printf("<b>ID: %s </b> <br>  Vorname: %s <br> Nachnamen: %s <br> Guthaben: %s € <br>", $row["id"], $row["Vorname"], $row["Nachname"], $row["Guthaben"]);
+                echo "<br>";
+            }
+        }
+        
+        function insertUser($id, $vorname, $nachname) {
+            $insertUser = "INSERT INTO user (id,vorname,nachname) VALUES ($id, $vorname, $nachname)";
+            $insertUserSuccess = mysql_query($insertUser);
+        }
 
-            print '<br>';
-            print '<br>';
-            print '<h1>Artikel</h1>';
-            print '<br>';
-            print '<br>';
-
-            echo json_encode($e);
-
-            //Save Data in .json 
-            file_put_contents($json_url, json_encode($e, TRUE));
-        ?>
+        function insertItem($id, $name, $preis)  {
+            $insertItem = "INSERT INTO items (id,name,preis) VALUES ($id,$name,$preis)";
+            $insertItemSuccess = mysql_query($insertItem);
+        }
+        getData();
+        
+        ?>      
     
     </div>
     <!-- /.container -->
